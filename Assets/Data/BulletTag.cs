@@ -4,8 +4,11 @@ using UnityEngine;
 using Unity.Entities;
 
 /// <summary>
-/// 弾だという事を識別するための中身が無い構造体
+/// 弾だという事を識別するための構造体
 /// </summary>
 [GenerateAuthoringComponent]
 public struct BulletTag : IComponentData
-{ }
+{
+    [Header("弾速")]
+    public float _speed;
+}
