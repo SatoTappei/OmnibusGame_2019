@@ -2,9 +2,12 @@
 using Unity.Mathematics;
 using UnityEngine;
 
-[GenerateAuthoringComponent]
-public struct RotateTag : IComponentData
+namespace Danmaku3D
 {
-    [Header("回転速度")]
-    public float _speed;
+    [GenerateAuthoringComponent]
+    public struct RotateTag : IComponentData
+    {
+        [Header("回転速度")]
+        public float _speed;
+    }
 }

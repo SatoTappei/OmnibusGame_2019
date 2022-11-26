@@ -5,17 +5,20 @@ using Unity.Entities;
 using Unity.Transforms;
 using Unity.Jobs;
 
-public class BulletMovementSystem : JobComponentSystem
+namespace Danmaku3D
 {
-    protected override JobHandle OnUpdate(JobHandle inputDeps)
+    public class BulletMovementSystem : JobComponentSystem
     {
-        float deltaTime = Time.DeltaTime;
-
-        Entities.ForEach((ref Translation trans, in LocalToWorld localToWorld, in BulletTag bulletTag) =>
+        protected override JobHandle OnUpdate(JobHandle inputDeps)
         {
-            trans.Value += localToWorld.Forward * bulletTag._speed * deltaTime;
-        }).Run();
+            float deltaTime = Time.DeltaTime;
 
-        return default;
+            Entities.ForEach((ref Translation trans, in LocalToWorld localToWorld, in BulletTag bulletTag) =>
+            {
+                trans.Value += localToWorld.Forward * bulletTag._speed * deltaTime;
+            }).Run();
+
+            return default;
+        }
     }
 }

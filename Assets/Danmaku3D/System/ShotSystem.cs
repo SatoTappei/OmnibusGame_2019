@@ -2,55 +2,59 @@
 using Unity.Jobs;
 using Unity.Transforms;
 
-public class ShotSystem : JobComponentSystem
+namespace Danmaku3D
 {
-    // ジョブで処理した内容をためるバッファー
-    BeginSimulationEntityCommandBufferSystem _entityCommandBufferSystem;
-
-    float _interval;
-
-    protected override void OnCreate()
+    public class ShotSystem : JobComponentSystem
     {
+        // ジョブで処理した内容をためるバッファー
+        BeginSimulationEntityCommandBufferSystem _entityCommandBufferSystem;
 
-        // Worldからバッファーのシステムを生成する
-        _entityCommandBufferSystem = World.GetOrCreateSystem<BeginSimulationEntityCommandBufferSystem>();
-    }
+        float _interval;
 
-    protected override JobHandle OnUpdate(JobHandle inputDeps)
-    {
-        // 毎フレーム処理をためるためのバッファーを生成する
-        EntityCommandBuffer commandBuffer = _entityCommandBufferSystem.CreateCommandBuffer();
-
-        if (_interval > 0.15f)
+        protected override void OnCreate()
         {
-            // タグで絞り込むとエラーが出るのでコメントアウト
-            Entities/*.WithAll<MuzzleTag>()*/
-                    .WithoutBurst()
-                    .ForEach((in MuzzleTag tag, in LocalToWorld localToWorld) =>
-                    {
+
+            // Worldからバッファーのシステムを生成する
+            _entityCommandBufferSystem = World.GetOrCreateSystem<BeginSimulationEntityCommandBufferSystem>();
+        }
+
+        protected override JobHandle OnUpdate(JobHandle inputDeps)
+        {
+            // 毎フレーム処理をためるためのバッファーを生成する
+            EntityCommandBuffer commandBuffer = _entityCommandBufferSystem.CreateCommandBuffer();
+
+            if (_interval > 0.15f)
+            {
+                // タグで絞り込むとエラーが出るのでコメントアウト
+                Entities/*.WithAll<MuzzleTag>()*/
+                        .WithoutBurst()
+                        .ForEach((in MuzzleTag tag, in LocalToWorld localToWorld) =>
+                        {
                         // GameObjectのプレハブから弾を生成する
                         Entity bullet = commandBuffer.Instantiate(tag._bulletPrefab);
 
                         // 位置をローカル座標系でセットする
                         commandBuffer.SetComponent(bullet, new Translation
-                        {
-                            Value = localToWorld.Position
-                        });
+                            {
+                                Value = localToWorld.Position
+                            });
 
                         // 回転をローカル座標系でセットする
                         commandBuffer.SetComponent(bullet, new Rotation
-                        {
-                            Value = localToWorld.Rotation
-                        });
-                    }).Run();
+                            {
+                                Value = localToWorld.Rotation
+                            });
+                        }).Run();
 
-            // コマンドバッファをジョブに依存させてJobが完了する前に実行されるのを防ぐ
-            _entityCommandBufferSystem.AddJobHandleForProducer(inputDeps);
-            _interval = 0;
+                // コマンドバッファをジョブに依存させてJobが完了する前に実行されるのを防ぐ
+                _entityCommandBufferSystem.AddJobHandleForProducer(inputDeps);
+                _interval = 0;
+            }
+
+            _interval += Time.DeltaTime;
+
+            return default;
         }
-
-        _interval += Time.DeltaTime;
-
-        return default;
     }
+
 }

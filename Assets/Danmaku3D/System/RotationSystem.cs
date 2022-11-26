@@ -6,13 +6,15 @@ using Unity.Transforms;
 using Unity.Mathematics;
 using Unity.Jobs;
 
-public class RotationSystem : JobComponentSystem
+namespace Danmaku3D
 {
-    protected override JobHandle OnUpdate(JobHandle inputDeps)
+    public class RotationSystem : JobComponentSystem
     {
-        float deltaTime = Time.DeltaTime;
+        protected override JobHandle OnUpdate(JobHandle inputDeps)
+        {
+            float deltaTime = Time.DeltaTime;
 
-        Entities.ForEach((ref Rotation rot, in RotateTag tag) =>
+            Entities.ForEach((ref Rotation rot, in RotateTag tag) =>
             {
                 quaternion normalizedRot = math.normalizesafe(rot.Value);
                 quaternion angleToRotate = quaternion.AxisAngle(math.up(), tag._speed * deltaTime);
@@ -20,6 +22,7 @@ public class RotationSystem : JobComponentSystem
                 rot.Value = math.mul(normalizedRot, angleToRotate);
             }).Run();
 
-        return inputDeps;
+            return inputDeps;
+        }
     }
 }
